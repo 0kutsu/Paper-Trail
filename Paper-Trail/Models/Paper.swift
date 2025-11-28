@@ -10,7 +10,7 @@ import SwiftData
 
 struct ReturnedData: Decodable, Hashable {
     let total: Int
-    let data: [Paper]
+    let data: [Paper]?
     
     enum CodingKeys: String, CodingKey {
         case total
