@@ -11,7 +11,8 @@ import SwiftUI
 struct Paper_TrailApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            CasualSearchView()
+                .environment(PaperTrailViewModel())
         }
     }
 }
