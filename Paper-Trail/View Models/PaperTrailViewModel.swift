@@ -18,7 +18,12 @@ import Foundation
         return formatter.string(from: date)
     }
     
-    func getAdvancedSearch(tags: [String], authors: [String], citationCount: String, startDate: Date, endDate: Date, onlyOpenAccess: Bool) async throws -> [Paper]? {
+    func getAdvancedSearch(tags: [String],
+                           authors: [String],
+                           citationCount: String,
+                           startDate: Date,
+                           endDate: Date,
+                           onlyOpenAccess: Bool) async throws -> [Paper]? {
         let startDateString = formatDateToString(date: startDate)
         let endDateString = formatDateToString(date: endDate)
         var citationCountInt: Int? = nil
@@ -27,7 +32,14 @@ import Foundation
         }
         
         do {
-            let returnedData = try await NetworkManager.instance.getAdvancedSearch(tags: tags, authors: authors, citationCount: citationCountInt, startDate: startDateString, endDate: endDateString, onlyOpenAccess: onlyOpenAccess)
+            let returnedData = try await NetworkManager.instance.getAdvancedSearch(
+                tags: tags,
+                authors: authors,
+                citationCount: citationCountInt,
+                startDate: startDateString,
+                endDate: endDateString,
+                onlyOpenAccess: onlyOpenAccess
+            )
             return returnedData.data
         } catch NetworkError.tooManyRequests {
             return nil
