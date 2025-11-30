@@ -93,6 +93,7 @@ struct CasualSearchView: View {
             
             Spacer()
             
+            
             VStack {
                 isInvalid ? (
                     tooManyRequests ?
@@ -141,6 +142,20 @@ struct CasualSearchView: View {
                 .background(Color.blue)
                 .cornerRadius(8)
                 .padding()
+
+                NavigationLink {
+                    SwipeDeckView()
+                } label: {
+                    Text("Start viewing articles")
+                        .foregroundColor(.white)
+                        .bold()
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .background(vm.papers.isEmpty ? Color.gray : Color.green)
+                .cornerRadius(8)
+                .padding(.horizontal)
+                .disabled(vm.papers.isEmpty)
             }
             
             Text("Swipe up for advanced search")
@@ -154,7 +169,10 @@ struct CasualSearchView: View {
                 )
         }
         .sheet(isPresented: $isShowingSheet, onDismiss: didDismiss) {
-            AdvancedSearchView()
+            NavigationStack {
+                AdvancedSearchView()
+            }
+            .environment(vm)
         }
     }
     
@@ -164,6 +182,8 @@ struct CasualSearchView: View {
 }
 
 #Preview {
-    CasualSearchView()
-        .environment(PaperTrailViewModel())
+    NavigationStack {
+        CasualSearchView()
+    }
+    .environment(PaperTrailViewModel())
 }
