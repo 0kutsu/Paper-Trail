@@ -32,3 +32,4 @@ struct AddedTagView: View {
     AddedTagView(tagName: "bye")
         .environment(PaperTrailViewModel())
 }
+
