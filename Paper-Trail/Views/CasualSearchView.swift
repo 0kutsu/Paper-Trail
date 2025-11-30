@@ -16,6 +16,7 @@ struct CasualSearchView: View {
     @State var tooManyRequests: Bool = false
     
     @State var isShowingSheet: Bool = false
+    @State var clickedSearch: Bool = false
     
     var body: some View {
         VStack {
@@ -109,26 +110,38 @@ struct CasualSearchView: View {
                     .foregroundColor(.red)
                 
                 Button(action: {
-                    if vm.tags.isEmpty {
-                        isInvalid = true
-                    } else {
-                        Task {
-                            do {
-                                let returnedPapers = try await vm.getCasualSearch(input: vm.tags)
-                                if let returnedPapers {
-                                    if !returnedPapers.isEmpty {
-                                        vm.papers = returnedPapers
-                                        isInvalid = false
+                    Task {
+                        if !clickedSearch {
+                            clickedSearch = true
+                            try await vm.wait()
+                        }
+                        
+                        if vm.tags.isEmpty {
+                            isInvalid = true
+                            clickedSearch = false
+                        } else {
+                            Task {
+                                do {
+                                    clickedSearch = true
+                                    let returnedPapers = try await vm.getCasualSearch(input: vm.tags)
+                                    if let returnedPapers {
+                                        if !returnedPapers.isEmpty {
+                                            vm.papers = returnedPapers
+                                            isInvalid = false
+                                        } else {
+                                            isInvalid = true
+                                        }
+                                        tooManyRequests = false
+                                        clickedSearch = false
                                     } else {
                                         isInvalid = true
+                                        tooManyRequests = true
+                                        clickedSearch = false
                                     }
-                                    tooManyRequests = false
-                                } else {
+                                } catch {
                                     isInvalid = true
-                                    tooManyRequests = true
+                                    clickedSearch = false
                                 }
-                            } catch {
-                                isInvalid = true
                             }
                         }
                     }
@@ -139,7 +152,7 @@ struct CasualSearchView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
-                .background(Color.blue)
+                .background(clickedSearch ? Color.gray : Color.blue)
                 .cornerRadius(8)
                 .padding()
 

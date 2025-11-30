@@ -19,6 +19,7 @@ struct AdvancedSearchView: View {
     
     @State var isInvalid: Bool = false
     @State var tooManyRequests: Bool = false
+    @State var clickedSearch: Bool = false
     
     var body: some View {
         Text("Advanced Search")
@@ -160,7 +161,13 @@ struct AdvancedSearchView: View {
                     isInvalid = true
                 } else {
                     Task {
+                        if !clickedSearch {
+                            clickedSearch = true
+                            try await vm.wait()
+                        }
+                        
                         do {
+                            clickedSearch = true
                             let returnedPapers = try await vm.getAdvancedSearch(
                                 tags: Array(vm.tags),
                                 authors: Array(vm.authors),
@@ -177,12 +184,15 @@ struct AdvancedSearchView: View {
                                     isInvalid = true
                                 }
                                 tooManyRequests = false
+                                clickedSearch = false
                             } else {
                                 isInvalid = true
                                 tooManyRequests = true
+                                clickedSearch = false
                             }
                         } catch {
                             isInvalid = true
+                            clickedSearch = false
                         }
                     }
                 }
@@ -193,7 +203,7 @@ struct AdvancedSearchView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
-            .background(Color.blue)
+            .background(clickedSearch ? Color.gray : Color.blue)
             .cornerRadius(8)
             .padding(.horizontal)
 

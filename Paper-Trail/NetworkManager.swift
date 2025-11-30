@@ -18,6 +18,7 @@ enum NetworkError: String, Error {
 class NetworkManager {
     static let instance = NetworkManager()
     
+    let apiKey = "nN7Gh2PKDh9fdEDAleltoTBGhZATUdcanc50Kr9a"
     let baseURL = "https://api.semanticscholar.org/graph/v1/paper/search?query="
     
     private let fields =
@@ -63,14 +64,14 @@ class NetworkManager {
         
         guard let url = URL(string: hasCitationCount ?
                             (onlyOpenAccess ?
-                             "\(baseURL)\(query)&year=\(startDate):\(endDate)&openAccessPdf&fields=\(fields)&minCitationCount=\(citationQuery)&limit=\(resultLimit)"
+                             "\(baseURL)\(query)&year=\(startDate):\(endDate)&openAccessPdf&fields=\(fields)&minCitationCount=\(citationQuery)&limit=\(resultLimit)&appid=\(apiKey)"
                              :
-                             "\(baseURL)\(query)&year=\(startDate):\(endDate)&fields=\(fields)&minCitationCount=\(citationQuery)&limit=\(resultLimit)")
+                             "\(baseURL)\(query)&year=\(startDate):\(endDate)&fields=\(fields)&minCitationCount=\(citationQuery)&limit=\(resultLimit)&appid=\(apiKey)")
                             :
                             (onlyOpenAccess ?
-                             "\(baseURL)\(query)&year=\(startDate):\(endDate)&openAccessPdf&fields=\(fields)&limit=\(resultLimit)"
+                             "\(baseURL)\(query)&year=\(startDate):\(endDate)&openAccessPdf&fields=\(fields)&limit=\(resultLimit)&appid=\(apiKey)"
                              :
-                             "\(baseURL)\(query)&year=\(startDate):\(endDate)&fields=\(fields)&limit=\(resultLimit)")
+                             "\(baseURL)\(query)&year=\(startDate):\(endDate)&fields=\(fields)&limit=\(resultLimit)&appid=\(apiKey)")
         ) else {
             throw NetworkError.invalidURL
         }
@@ -139,7 +140,7 @@ class NetworkManager {
         
         guard let url = URL(string: containsFieldOfStudy
                             ? "\(baseURL)\(tagsQuery)&fieldsOfStudy=\(fieldOfStudyTags.joined(separator: ","))&fields=\(fields)&limit=\(resultLimit)"
-                            : "\(baseURL)\(tagsQuery)&fields=\(fields)&limit=\(resultLimit)"
+                            : "\(baseURL)\(tagsQuery)&fields=\(fields)&limit=\(resultLimit)&appid=\(apiKey)"
         ) else {
             throw NetworkError.invalidURL
         }
