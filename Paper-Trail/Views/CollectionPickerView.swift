@@ -10,7 +10,7 @@ import SwiftUI
 
 struct CollectionPickerView: View {
     let paper: Paper
-    @ObservedObject var library: LibraryStore
+    @State var library: LibraryStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var newFolderName: String = ""

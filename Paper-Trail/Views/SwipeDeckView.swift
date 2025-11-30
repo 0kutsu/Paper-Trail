@@ -11,7 +11,7 @@ import SwiftUI
 
 struct SwipeDeckView: View {
     @Environment(PaperTrailViewModel.self) var vm: PaperTrailViewModel
-    @StateObject private var library = LibraryStore.shared
+    @State private var library = LibraryStore.shared
 
     @State private var currentIndex: Int = 0
     @State private var showCollectionPicker: Bool = false

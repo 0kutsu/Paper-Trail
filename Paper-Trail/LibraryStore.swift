@@ -23,12 +23,13 @@ struct PaperFolder: Identifiable, Codable, Equatable {
 }
 
 
-final class LibraryStore: ObservableObject {
+@Observable
+final class LibraryStore {
     static let shared = LibraryStore()
 
-    @Published private(set) var favoriteIDs: Set<String> = []
-    @Published private(set) var seenPaperIDs: Set<String> = []
-    @Published private(set) var folders: [PaperFolder] = []
+    private(set) var favoriteIDs: Set<String> = []
+    private(set) var seenPaperIDs: Set<String> = []
+    private(set) var folders: [PaperFolder] = []
 
     private let favoritesKey = "papertrail_favorite_ids"
     private let seenKey      = "papertrail_seen_ids"
