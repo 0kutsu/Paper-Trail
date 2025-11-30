@@ -55,10 +55,6 @@ struct SwipeDeckView: View {
                     onSwipe: handleSwipe(_:)
                 )
                 .padding()
-                .onAppear {
-                   
-                    library.markSeen(paper)
-                }
             } else {
                 VStack(spacing: 8) {
                     Text("No more results")
