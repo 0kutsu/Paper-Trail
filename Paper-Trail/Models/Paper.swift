@@ -18,6 +18,12 @@ struct ReturnedData: Decodable, Hashable {
     }
 }
 
+struct ExternalIds: Decodable, Hashable {
+    let DOI: String?
+    let PubMed: String?
+    let ArXiv: String?
+}
+
 struct Paper: Decodable, Hashable {
     let paperId: String?
     let title: String?
@@ -26,6 +32,9 @@ struct Paper: Decodable, Hashable {
     let fieldsOfStudy: [String]?
     let publicationDate: String?
     let authors: [Author]?
+    let tldr: Tldr?
+    let externalIds: ExternalIds?
+    let publicationTypes: [String]?
     
     enum CodingKeys: String, CodingKey {
         case paperId
@@ -35,6 +44,9 @@ struct Paper: Decodable, Hashable {
         case fieldsOfStudy
         case publicationDate
         case authors
+        case tldr
+        case externalIds
+        case publicationTypes
     }
 }
 
@@ -53,5 +65,13 @@ struct Author: Decodable, Hashable {
     enum CodingKeys: String, CodingKey {
         case authorId
         case name
+    }
+}
+
+struct Tldr: Decodable, Hashable {
+    let text: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case text
     }
 }
