@@ -12,13 +12,25 @@ import Foundation
     var authors: Set<String> = []
     var papers: [Paper] = []
     
+    func wait() async throws {
+        try await Task.sleep(nanoseconds: 2_000_000_000)
+    }
+    
     func formatDateToString(date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: date)
     }
     
-    func getAdvancedSearch(tags: [String], authors: [String], citationCount: String, startDate: Date, endDate: Date, onlyOpenAccess: Bool) async throws -> [Paper]? {
+    func getAdvancedSearch(tags: [String],
+                           authors: [String],
+                           citationCount: String,
+                           startDate: Date,
+                           endDate: Date,
+                           onlyOpenAccess: Bool) async throws -> [Paper]? {
+        print("sent request")
+        print(Date())
+        
         let startDateString = formatDateToString(date: startDate)
         let endDateString = formatDateToString(date: endDate)
         var citationCountInt: Int? = nil
@@ -27,7 +39,14 @@ import Foundation
         }
         
         do {
-            let returnedData = try await NetworkManager.instance.getAdvancedSearch(tags: tags, authors: authors, citationCount: citationCountInt, startDate: startDateString, endDate: endDateString, onlyOpenAccess: onlyOpenAccess)
+            let returnedData = try await NetworkManager.instance.getAdvancedSearch(
+                tags: tags,
+                authors: authors,
+                citationCount: citationCountInt,
+                startDate: startDateString,
+                endDate: endDateString,
+                onlyOpenAccess: onlyOpenAccess
+            )
             return returnedData.data
         } catch NetworkError.tooManyRequests {
             return nil
@@ -35,6 +54,9 @@ import Foundation
     }
     
     func getCasualSearch(input: Set<String>) async throws -> [Paper]? {
+        print("sent request")
+        print(Date())
+        
         do {
             let returnedData = try await NetworkManager.instance.getCasualSearch(tags: Array(input))
             return returnedData.data
@@ -59,3 +81,4 @@ import Foundation
         authors.remove(author)
     }
 }
+

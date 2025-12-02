@@ -19,6 +19,7 @@ struct AdvancedSearchView: View {
     
     @State var isInvalid: Bool = false
     @State var tooManyRequests: Bool = false
+    @State var clickedSearch: Bool = false
     
     var body: some View {
         Text("Advanced Search")
@@ -154,45 +155,78 @@ struct AdvancedSearchView: View {
             .padding(5)
             .foregroundColor(.red)
         
-        Button(action: {
-            if vm.tags.isEmpty && vm.authors.isEmpty {
-                isInvalid = true
-            } else {
-                Task {
-                    do {
-                        let returnedPapers = try await vm.getAdvancedSearch(tags: Array(vm.tags), authors: Array(vm.authors), citationCount: citationCount, startDate: startDate, endDate: endDate, onlyOpenAccess: showOnlyOpenAccess)
-                        if let returnedPapers {
-                            if !returnedPapers.isEmpty {
-                                vm.papers = returnedPapers
-                                isInvalid = false
+        VStack {
+            Button(action: {
+                if vm.tags.isEmpty && vm.authors.isEmpty {
+                    isInvalid = true
+                } else {
+                    Task {
+                        if !clickedSearch {
+                            clickedSearch = true
+                            try await vm.wait()
+                        }
+                        
+                        do {
+                            clickedSearch = true
+                            let returnedPapers = try await vm.getAdvancedSearch(
+                                tags: Array(vm.tags),
+                                authors: Array(vm.authors),
+                                citationCount: citationCount,
+                                startDate: startDate,
+                                endDate: endDate,
+                                onlyOpenAccess: showOnlyOpenAccess
+                            )
+                            if let returnedPapers {
+                                if !returnedPapers.isEmpty {
+                                    vm.papers = returnedPapers
+                                    isInvalid = false
+                                } else {
+                                    isInvalid = true
+                                }
+                                tooManyRequests = false
+                                clickedSearch = false
                             } else {
                                 isInvalid = true
+                                tooManyRequests = true
+                                clickedSearch = false
                             }
-                            tooManyRequests = false
-                        } else {
+                        } catch {
                             isInvalid = true
-                            tooManyRequests = true
+                            clickedSearch = false
                         }
-                    } catch {
-                        isInvalid = true
                     }
                 }
+            }) {
+                Text("Find papers")
+                    .foregroundColor(.white)
+                    .bold()
+                    .frame(maxWidth: .infinity)
             }
-        }) {
-            Text("Find papers")
-                .foregroundColor(.white)
-                .bold()
-                .frame(maxWidth: .infinity)
+            .buttonStyle(.bordered)
+            .background(clickedSearch ? Color.gray : Color.blue)
+            .cornerRadius(8)
+            .padding(.horizontal)
+
+            NavigationLink {
+                SwipeDeckView()
+            } label: {
+                Text("Start viewing articles")
+                    .foregroundColor(.white)
+                    .bold()
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .background(vm.papers.isEmpty ? Color.gray : Color.green)
+            .cornerRadius(8)
+            .padding(.horizontal)
+            .disabled(vm.papers.isEmpty)
         }
-        .buttonStyle(.bordered)
-        .background(Color.blue)
-        .cornerRadius(8)
-        .padding(.horizontal)
     }
 }
 
-
 #Preview {
-    AdvancedSearchView()
-        .environment(PaperTrailViewModel())
+    NavigationStack {
+        AdvancedSearchView()
+    }
+    .environment(PaperTrailViewModel())
 }
