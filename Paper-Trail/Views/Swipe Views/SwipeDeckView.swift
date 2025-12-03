@@ -21,7 +21,6 @@ struct SwipeDeckView: View {
         vm.papers.filter { !library.isFavorite($0) }
     }
 
-
     private var currentPaper: Paper? {
         guard currentIndex < papersToShow.count else { return nil }
         return papersToShow[currentIndex]
@@ -84,6 +83,7 @@ struct SwipeDeckView: View {
         switch direction {
         case .right:
             library.addToFavorites(paper)
+            library.addToSelectedFolder(paper)
         case .left:
             library.markSeen(paper)
         }

@@ -10,10 +10,12 @@ import SwiftData
 
 @main
 struct Paper_TrailApp: App {
+    @State var vm = PaperTrailViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            CasualSearchView()
-                .environment(PaperTrailViewModel())
+            ContentView()
+                .environment(vm)
         }
     }
 }

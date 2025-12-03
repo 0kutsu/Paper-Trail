@@ -70,7 +70,7 @@ struct PaperCardContent: View {
                         )
                 }
 
-                
+            
                 if let fields = paper.fieldsOfStudy, !fields.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 6) {

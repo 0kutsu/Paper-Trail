@@ -18,21 +18,11 @@ struct CollectionPickerView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Quick actions") {
-                    Button {
-                        library.addToFavorites(paper)
-                        dismiss()
-                    } label: {
-                        Label("Save to Favorites", systemImage: "star.fill")
-                    }
-                }
-
-                
                 if !library.folders.isEmpty {
                     Section("Existing folders") {
                         ForEach(library.folders) { folder in
                             Button {
-                                library.add(paper, to: folder)
+                                library.selectFolder(folder)
                                 dismiss()
                             } label: {
                                 Label(folder.name, systemImage: "folder")
@@ -52,7 +42,7 @@ struct CollectionPickerView: View {
 
                             library.addFolder(named: trimmed)
                             if let folder = library.folders.first(where: { $0.name == trimmed }) {
-                                library.add(paper, to: folder)
+                                library.selectFolder(folder)
                             }
                             newFolderName = ""
                             dismiss()
@@ -70,7 +60,6 @@ struct CollectionPickerView: View {
         }
     }
 }
-
 
 #Preview {
     let samplePaper = Paper(

@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+import Foundation
+import SwiftUI
+
 struct CasualSearchView: View {
     @Environment(PaperTrailViewModel.self) var vm: PaperTrailViewModel
     @State var input: String = ""

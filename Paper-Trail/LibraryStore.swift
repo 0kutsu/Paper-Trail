@@ -26,9 +26,11 @@ struct PaperFolder: Identifiable, Codable, Equatable, Hashable {
 @Observable
 final class LibraryStore {
     static let shared = LibraryStore()
+    private(set) var defaultFolder = PaperFolder(id: UUID(), name: "Default", paperIDs: [])
 
     private(set) var favoriteIDs: Set<String> = []
     private(set) var seenPaperIDs: Set<String> = []
+    private(set) var selectedFolder: PaperFolder?
     private(set) var folders: [PaperFolder] = []
     private(set) var paperCache: [String : Paper] = [:]
 
@@ -37,6 +39,9 @@ final class LibraryStore {
     private let foldersKey   = "papertrail_folders"
 
     private init() {
+        folders = [defaultFolder]
+        selectedFolder = defaultFolder
+        
         load()
     }
 
@@ -81,6 +86,35 @@ final class LibraryStore {
     func addFolder(named name: String) {
         guard !folders.contains(where: { $0.name == name }) else { return }
         folders.append(PaperFolder(name: name))
+        save()
+    }
+    
+    func selectFolder(_ folder: PaperFolder) {
+            guard let existing = folders.first(where: { $0.id == folder.id }) else { return }
+            selectedFolder = existing
+            save()
+        }
+
+    func addToSelectedFolder(_ paper: Paper) {
+        let pid = paper.stableID
+        
+        if let selectedFolder = self.selectedFolder {
+            if paperCache[pid] == nil {
+                paperCache[pid] = paper
+            }
+            
+            guard let idx = folders.firstIndex(where: { $0.id == selectedFolder.id }) else {
+                self.selectedFolder = defaultFolder
+                return
+            }
+            
+            if !folders[idx].paperIDs.contains(pid) {
+                folders[idx].paperIDs.append(pid)
+            }
+            
+            self.selectedFolder = folders[idx]
+            markSeen(paper)
+        }
         save()
     }
 

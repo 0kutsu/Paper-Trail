@@ -16,7 +16,7 @@ struct FolderDetailView: View {
             store.favoritePaper(by: id)
         }
     }
-
+    
     var body: some View {
         List(papers, id: \.stableID) { paper in
             NavigationLink {
