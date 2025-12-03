@@ -27,12 +27,10 @@ final class LibraryStore {
     static let shared = LibraryStore()
     private(set) var defaultFolder = PaperFolder(id: UUID(), name: "Default", paperIDs: [])
 
-    private(set) var favoriteIDs: Set<String> = []
     private(set) var seenPaperIDs: Set<String> = []
     private(set) var selectedFolder: PaperFolder?
     private(set) var folders: [PaperFolder] = []
 
-    private let favoritesKey = "papertrail_favorite_ids"
     private let seenKey      = "papertrail_seen_ids"
     private let foldersKey   = "papertrail_folders"
     private let selectedFolderKey = "papertrail_selected_folder_id"
@@ -43,23 +41,6 @@ final class LibraryStore {
         
         load()
     }
-
-    func isFavorite(_ paper: Paper) -> Bool {
-        favoriteIDs.contains(paper.stableID)
-    }
-
-    func addToFavorites(_ paper: Paper) {
-        let pid = paper.stableID
-        favoriteIDs.insert(pid)
-        markSeen(paper)
-        save()
-    }
-
-    func removeFromFavorites(_ paper: Paper) {
-        favoriteIDs.remove(paper.stableID)
-        save()
-    }
-
 
     func hasSeen(_ paper: Paper) -> Bool {
         seenPaperIDs.contains(paper.stableID)
@@ -107,6 +88,10 @@ final class LibraryStore {
         savePaper(paper)
         save()
     }
+    
+    func libraryContains(_ paper: Paper) -> Bool {
+        return self.loadPaper(with: paper.stableID) != nil
+    }
 
     func add(_ paper: Paper, to folder: PaperFolder) {
         guard let idx = folders.firstIndex(where: { $0.id == folder.id }) else { return }
@@ -116,7 +101,6 @@ final class LibraryStore {
             folders[idx].paperIDs.append(pid)
         }
 
-        favoriteIDs.insert(pid)
         markSeen(paper)
         save()
     }
@@ -136,10 +120,6 @@ final class LibraryStore {
     private func load() {
         let defaults = UserDefaults.standard
         let decoder = JSONDecoder()
-
-        if let favArray = defaults.array(forKey: favoritesKey) as? [String] {
-            favoriteIDs = Set(favArray)
-        }
 
         if let seenArray = defaults.array(forKey: seenKey) as? [String] {
             seenPaperIDs = Set(seenArray)
@@ -163,7 +143,6 @@ final class LibraryStore {
         let defaults = UserDefaults.standard
         let encoder = JSONEncoder()
 
-        defaults.set(Array(favoriteIDs), forKey: favoritesKey)
         defaults.set(Array(seenPaperIDs), forKey: seenKey)
 
         if let data = try? encoder.encode(folders) {

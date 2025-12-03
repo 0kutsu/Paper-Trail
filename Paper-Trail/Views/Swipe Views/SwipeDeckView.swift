@@ -18,7 +18,7 @@ struct SwipeDeckView: View {
 
 
     private var papersToShow: [Paper] {
-        vm.papers.filter { !library.isFavorite($0) }
+        vm.papers.filter { !library.libraryContains($0) }
     }
 
     private var currentPaper: Paper? {

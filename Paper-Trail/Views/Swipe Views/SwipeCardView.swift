@@ -78,7 +78,7 @@ struct SwipeCardView: View {
                 .padding(.horizontal, 4)
 
 
-            PaperCardContent(paper: paper, hasSeen: hasSeen)
+            PaperCardContent(paper: paper, hasSeen: hasSeen, showSeen: true)
                 .padding()
         }
         .offset(offset)

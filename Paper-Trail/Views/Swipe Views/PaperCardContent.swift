@@ -11,6 +11,7 @@ import Foundation
 struct PaperCardContent: View {
     let paper: Paper
     let hasSeen: Bool
+    let showSeen: Bool
     @Environment(\.openURL) private var openURL
 
     @State private var isAbstractExpanded: Bool = false
@@ -57,17 +58,19 @@ struct PaperCardContent: View {
                     }
 
                     Spacer()
-
-                    Text(hasSeen ? "Seen" : "New")
-                        .font(.caption.bold())
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(hasSeen
-                                      ? Color.orange.opacity(0.2)
-                                      : Color.green.opacity(0.2))
-                        )
+                    
+                    if (showSeen) {
+                        Text(hasSeen ? "Seen" : "New")
+                            .font(.caption.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(hasSeen
+                                          ? Color.orange.opacity(0.2)
+                                          : Color.green.opacity(0.2))
+                            )
+                    }
                 }
 
             

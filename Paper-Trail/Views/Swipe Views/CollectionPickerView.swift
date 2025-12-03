@@ -27,12 +27,16 @@ struct CollectionPickerView: View {
                             } label: {
                                 HStack {
                                     Label(folder.name, systemImage: "folder")
+                                        .foregroundStyle(Color.primary)
                                     Spacer()
                                     if library.selectedFolder?.id == folder.id {
                                         Image(systemName: "checkmark")
+                                            .bold()
                                             .foregroundColor(.blue)
                                     }
                                 }
+                                
+                                
                             }
                         }
                     }

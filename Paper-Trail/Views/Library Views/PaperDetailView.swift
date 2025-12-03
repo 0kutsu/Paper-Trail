@@ -22,7 +22,7 @@ struct PaperDetailView: View {
                 )
                 .shadow(radius: 6)
 
-            PaperCardContent(paper: paper, hasSeen: true)
+            PaperCardContent(paper: paper, hasSeen: true, showSeen: false)
                 .padding()
         }
         .padding()
