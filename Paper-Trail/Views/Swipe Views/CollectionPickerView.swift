@@ -25,13 +25,19 @@ struct CollectionPickerView: View {
                                 library.selectFolder(folder)
                                 dismiss()
                             } label: {
-                                Label(folder.name, systemImage: "folder")
+                                HStack {
+                                    Label(folder.name, systemImage: "folder")
+                                    Spacer()
+                                    if library.selectedFolder?.id == folder.id {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(.blue)
+                                    }
+                                }
                             }
                         }
                     }
                 }
 
-                
                 Section("Create new folder") {
                     HStack {
                         TextField("Folder name", text: $newFolderName)

@@ -82,7 +82,6 @@ struct SwipeDeckView: View {
 
         switch direction {
         case .right:
-            library.addToFavorites(paper)
             library.addToSelectedFolder(paper)
         case .left:
             library.markSeen(paper)

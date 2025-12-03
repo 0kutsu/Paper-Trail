@@ -22,7 +22,6 @@ struct PaperFolder: Identifiable, Codable, Equatable, Hashable {
     }
 }
 
-
 @Observable
 final class LibraryStore {
     static let shared = LibraryStore()
@@ -32,11 +31,11 @@ final class LibraryStore {
     private(set) var seenPaperIDs: Set<String> = []
     private(set) var selectedFolder: PaperFolder?
     private(set) var folders: [PaperFolder] = []
-    private(set) var paperCache: [String : Paper] = [:]
 
     private let favoritesKey = "papertrail_favorite_ids"
     private let seenKey      = "papertrail_seen_ids"
     private let foldersKey   = "papertrail_folders"
+    private let selectedFolderKey = "papertrail_selected_folder_id"
 
     private init() {
         folders = [defaultFolder]
@@ -52,7 +51,6 @@ final class LibraryStore {
     func addToFavorites(_ paper: Paper) {
         let pid = paper.stableID
         favoriteIDs.insert(pid)
-        paperCache[pid] = paper
         markSeen(paper)
         save()
     }
@@ -69,18 +67,12 @@ final class LibraryStore {
 
     func markSeen(_ paper: Paper) {
         let pid = paper.stableID
-        
-        if paperCache[pid] == nil {
-                paperCache[pid] = paper
-            }
+
         
         if !hasSeen(paper) {
             seenPaperIDs.insert(pid)
             save()
         }
-    }
-    func favoritePaper(by id: String) -> Paper? {
-        paperCache[id]
     }
 
     func addFolder(named name: String) {
@@ -90,19 +82,15 @@ final class LibraryStore {
     }
     
     func selectFolder(_ folder: PaperFolder) {
-            guard let existing = folders.first(where: { $0.id == folder.id }) else { return }
-            selectedFolder = existing
-            save()
-        }
+        guard let existing = folders.first(where: { $0.id == folder.id }) else { return }
+        selectedFolder = existing
+        save()
+    }
 
     func addToSelectedFolder(_ paper: Paper) {
         let pid = paper.stableID
         
         if let selectedFolder = self.selectedFolder {
-            if paperCache[pid] == nil {
-                paperCache[pid] = paper
-            }
-            
             guard let idx = folders.firstIndex(where: { $0.id == selectedFolder.id }) else {
                 self.selectedFolder = defaultFolder
                 return
@@ -115,6 +103,8 @@ final class LibraryStore {
             self.selectedFolder = folders[idx]
             markSeen(paper)
         }
+        
+        savePaper(paper)
         save()
     }
 
@@ -126,12 +116,22 @@ final class LibraryStore {
             folders[idx].paperIDs.append(pid)
         }
 
-        paperCache[pid] = paper
         favoriteIDs.insert(pid)
         markSeen(paper)
         save()
     }
+    
+    func savePaper(_ paper: Paper) {
+        let saveable = PaperSaveable(from: paper)
+        let data = try? JSONEncoder().encode(saveable)
+        UserDefaults.standard.set(data, forKey: "saved_paper_\(paper.stableID)")
+    }
 
+    func loadPaper(with id: String) -> Paper? {
+        guard let data = UserDefaults.standard.data(forKey: "saved_paper_\(id)") else { return nil }
+        let saved = try? JSONDecoder().decode(PaperSaveable.self, from: data)
+        return saved?.toPaper()
+    }
 
     private func load() {
         let defaults = UserDefaults.standard
@@ -149,6 +149,14 @@ final class LibraryStore {
            let decodedFolders = try? decoder.decode([PaperFolder].self, from: folderData) {
             folders = decodedFolders
         }
+        
+        if let selectedIDString = defaults.string(forKey: selectedFolderKey),
+               let selectedID = UUID(uuidString: selectedIDString),
+               let folder = folders.first(where: { $0.id == selectedID }) {
+                selectedFolder = folder
+            } else {
+                selectedFolder = defaultFolder
+        }
     }
 
     private func save() {
@@ -161,5 +169,9 @@ final class LibraryStore {
         if let data = try? encoder.encode(folders) {
             defaults.set(data, forKey: foldersKey)
         }
+        
+        if let selected = selectedFolder {
+                defaults.set(selected.id.uuidString, forKey: selectedFolderKey)
+            }
     }
 }

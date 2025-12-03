@@ -13,7 +13,7 @@ struct FolderDetailView: View {
     
     var papers: [Paper] {
         folder.paperIDs.compactMap { id in
-            store.favoritePaper(by: id)
+            store.loadPaper(with: id)
         }
     }
     
